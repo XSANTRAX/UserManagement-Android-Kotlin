@@ -1,7 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-
-<ScrollView
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fillViewport="true">
@@ -10,147 +8,146 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="30dp">
+        android:padding="24dp">
 
-        <!-- ===================================== -->
+        <!-- BARRA SUPERIOR CON FLECHA DE RETROCESO -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginBottom="10dp">
+
+            <ImageButton
+                android:id="@+id/btnBack"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="Volver"
+                android:src="@drawable/baseline_arrow_back_24" />
+
+
+        </LinearLayout>
+
         <!-- LOGO -->
-        <!-- ===================================== -->
-
         <ImageView
             android:layout_width="match_parent"
-            android:layout_height="100dp"
-            android:layout_marginTop="20dp"
-            android:layout_marginBottom="20dp"
+            android:layout_height="80dp"
+            android:layout_marginBottom="15dp"
             android:contentDescription="Logo UCompensar"
             android:scaleType="fitCenter"
             android:src="@drawable/logo_ucompensar" />
 
-        <!-- ===================================== -->
         <!-- TÍTULO -->
-        <!-- ===================================== -->
-
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="25dp"
+            android:layout_marginBottom="20dp"
             android:gravity="center"
             android:text="Registro de usuario"
-            android:textSize="28sp"
+            android:textSize="26sp"
             android:textStyle="bold" />
 
-        <!-- ===================================== -->
         <!-- NOMBRE -->
-        <!-- ===================================== -->
-
         <EditText
             android:id="@+id/etNombre"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:minHeight="48dp"
             android:hint="Nombre"
-            android:inputType="textPersonName" />
+            android:inputType="textPersonName"
+            android:importantForAutofill="no" />
 
-        <!-- ===================================== -->
         <!-- APELLIDO -->
-        <!-- ===================================== -->
-
         <EditText
             android:id="@+id/etApellido"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="15dp"
+            android:layout_marginTop="12dp"
+            android:minHeight="48dp"
             android:hint="Apellido"
-            android:inputType="textPersonName" />
+            android:inputType="textPersonName"
+            android:importantForAutofill="no" />
 
-        <!-- ===================================== -->
         <!-- CORREO -->
-        <!-- ===================================== -->
-
         <EditText
             android:id="@+id/etCorreoRegistro"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="15dp"
+            android:layout_marginTop="12dp"
+            android:minHeight="48dp"
             android:hint="Correo electrónico"
-            android:inputType="textEmailAddress" />
+            android:inputType="textEmailAddress"
+            android:autofillHints="emailAddress" />
 
-        <!-- ===================================== -->
         <!-- CONTRASEÑA -->
-        <!-- ===================================== -->
-
         <EditText
             android:id="@+id/etPasswordRegistro"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="15dp"
+            android:layout_marginTop="12dp"
+            android:minHeight="48dp"
             android:hint="Contraseña"
-            android:inputType="textPassword" />
+            android:inputType="textPassword"
+            android:autofillHints="password" />
 
-        <!-- ===================================== -->
-        <!-- EDAD -->
-        <!-- ===================================== -->
-
+        <!-- FECHA DE NACIMIENTO -->
         <EditText
-            android:id="@+id/etEdad"
+            android:id="@+id/etFechaNacimiento"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="15dp"
-            android:hint="Edad"
-            android:inputType="number" />
+            android:layout_marginTop="12dp"
+            android:minHeight="48dp"
+            android:focusable="false"
+            android:clickable="true"
+            android:hint="Fecha de nacimiento (AAAA-MM-DD)"
+            android:inputType="date"
+            android:importantForAutofill="no" />
 
-        <!-- ===================================== -->
-        <!-- ROL -->
-        <!-- ===================================== -->
+        <!-- UNIVERSIDAD -->
+        <EditText
+            android:id="@+id/etUniversidad"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:minHeight="48dp"
+            android:hint="Universidad"
+            android:inputType="text"
+            android:importantForAutofill="no" />
 
+        <!-- SEMESTRE -->
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
-            android:layout_marginBottom="5dp"
-            android:text="Rol"
-            android:textSize="16sp"
+            android:layout_marginTop="15dp"
+            android:layout_marginBottom="4dp"
+            android:text="Semestre"
+            android:textSize="15sp"
             android:textStyle="bold" />
 
         <Spinner
-            android:id="@+id/spRol"
+            android:id="@+id/spSemestre"
             android:layout_width="match_parent"
             android:layout_height="50dp" />
 
-        <!-- ===================================== -->
         <!-- BOTÓN REGISTRAR -->
-        <!-- ===================================== -->
-
         <Button
             android:id="@+id/btnRegistrar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="25dp"
+            android:layout_marginBottom="20dp"
             android:text="REGISTRAR" />
 
-        <!-- ===================================== -->
         <!-- MENSAJE -->
-        <!-- ===================================== -->
-
         <TextView
             android:id="@+id/tvMensajeRegistro"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="15dp"
+            android:layout_marginBottom="20dp"
             android:gravity="center"
             android:text=""
-            android:textSize="17sp" />
-
-        <!-- ===================================== -->
-        <!-- BOTÓN VOLVER -->
-        <!-- ===================================== -->
-
-        <Button
-            android:id="@+id/btnVolver"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="15dp"
-            android:layout_marginBottom="30dp"
-            android:text="VOLVER AL LOGIN" />
+            android:textSize="16sp" />
 
     </LinearLayout>
-
 </ScrollView>

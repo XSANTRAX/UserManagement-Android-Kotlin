@@ -1,17 +1,23 @@
 package com.example.parcialkotlinapp
 
-import android.R.attr.password
+import android.app.DatePickerDialog
 import android.os.Bundle
 import android.widget.*
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import com.example.parcialkotlinapp.api.ApiClient
 import com.example.parcialkotlinapp.models.CrearUsuarioRequest
 import com.example.parcialkotlinapp.models.Usuario
+import org.json.JSONObject
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import java.util.Calendar
 
 class RegistroActivity : AppCompatActivity() {
+
+    private var fechaNacimientoSeleccionada: String = ""
+    private var edadCalculada: Int = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -19,56 +25,69 @@ class RegistroActivity : AppCompatActivity() {
         setContentView(R.layout.activity_registro)
 
         // COMPONENTES
+        val btnBack = findViewById<ImageButton>(R.id.btnBack)
         val etNombre = findViewById<EditText>(R.id.etNombre)
         val etApellido = findViewById<EditText>(R.id.etApellido)
         val etCorreo = findViewById<EditText>(R.id.etCorreoRegistro)
         val etPasswordRegistro = findViewById<EditText>(R.id.etPasswordRegistro)
-
-        val etEdad = findViewById<EditText>(R.id.etEdad)
-
-        val spRol = findViewById<Spinner>(R.id.spRol)
-
+        val etFechaNacimiento = findViewById<EditText>(R.id.etFechaNacimiento)
+        val etUniversidad = findViewById<EditText>(R.id.etUniversidad)
+        val spSemestre = findViewById<Spinner>(R.id.spSemestre)
         val btnRegistrar = findViewById<Button>(R.id.btnRegistrar)
-        val btnVolver = findViewById<Button>(R.id.btnVolver)
+        val tvMensaje = findViewById<TextView>(R.id.tvMensajeRegistro)
 
-        val tvMensaje =
-            findViewById<TextView>(R.id.tvMensajeRegistro)
-
-        // ROLES
-        val roles = arrayOf(
-            "Seleccione un rol",
-            "Administrador",
-            "Usuario"
+        val semestres = arrayOf(
+            "Seleccione semestre",
+            "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"
         )
-
-        val adaptador = ArrayAdapter(
+        val adaptadorSemestre = ArrayAdapter(
             this,
             android.R.layout.simple_spinner_item,
-            roles
+            semestres
         )
-
-        adaptador.setDropDownViewResource(
+        adaptadorSemestre.setDropDownViewResource(
             android.R.layout.simple_spinner_dropdown_item
         )
+        spSemestre.adapter = adaptadorSemestre
 
-        spRol.adapter = adaptador
+        // BOTÓN FLECHA ATRÁS (SUPERIOR IZQUIERDA)
+        btnBack.setOnClickListener {
+            finish()
+        }
+
+        // DATE PICKER PARA FECHA DE NACIMIENTO
+        etFechaNacimiento.setOnClickListener {
+            val calendar = Calendar.getInstance()
+            val year = calendar.get(Calendar.YEAR)
+            val month = calendar.get(Calendar.MONTH)
+            val day = calendar.get(Calendar.DAY_OF_MONTH)
+
+            val datePickerDialog = DatePickerDialog(
+                this,
+                { _, selectedYear, selectedMonth, selectedDay ->
+                    // Formato YYYY-MM-DD
+                    val formattedMonth = String.format("%02d", selectedMonth + 1)
+                    val formattedDay = String.format("%02d", selectedDay)
+                    fechaNacimientoSeleccionada = "$selectedYear-$formattedMonth-$formattedDay"
+                    etFechaNacimiento.setText(fechaNacimientoSeleccionada)
+
+                    // Calcular edad considerando día, mes y año
+                    edadCalculada = calcularEdad(selectedYear, selectedMonth, selectedDay)
+                },
+                year,
+                month,
+                day
+            )
+            datePickerDialog.show()
+        }
 
         // BOTÓN REGISTRAR
         btnRegistrar.setOnClickListener {
-
-            val nombre =
-                etNombre.text.toString().trim()
-
-            val apellido =
-                etApellido.text.toString().trim()
-
-            val correo =
-                etCorreo.text.toString().trim()
-
+            val nombre = etNombre.text.toString().trim()
+            val apellido = etApellido.text.toString().trim()
+            val correo = etCorreo.text.toString().trim()
             val password = etPasswordRegistro.text.toString().trim()
-
-            val edadTexto =
-                etEdad.text.toString().trim()
+            val universidad = etUniversidad.text.toString().trim()
 
             // VALIDACIONES
             if (nombre.isBlank()) {
@@ -86,45 +105,33 @@ class RegistroActivity : AppCompatActivity() {
                 return@setOnClickListener
             }
 
-            if (!android.util.Patterns.EMAIL_ADDRESS
-                    .matcher(correo)
-                    .matches()) {
-
+            if (!android.util.Patterns.EMAIL_ADDRESS.matcher(correo).matches()) {
                 etCorreo.error = "Correo no válido"
                 return@setOnClickListener
             }
+
             if (password.isBlank()) {
                 etPasswordRegistro.error = "Ingrese la contraseña"
                 return@setOnClickListener
             }
 
-            if (edadTexto.isBlank()) {
-                etEdad.error = "Ingrese la edad"
+            if (fechaNacimientoSeleccionada.isBlank()) {
+                etFechaNacimiento.error = "Seleccione la fecha de nacimiento"
                 return@setOnClickListener
             }
 
-            val edad = edadTexto.toIntOrNull()
-
-            if (edad == null || edad < 1 || edad > 120) {
-                etEdad.error = "Edad no válida"
+            if (universidad.isBlank()) {
+                etUniversidad.error = "Ingrese la universidad"
                 return@setOnClickListener
             }
 
-            if (spRol.selectedItemPosition == 0) {
-
-                Toast.makeText(
-                    this,
-                    "Seleccione un rol",
-                    Toast.LENGTH_SHORT
-                ).show()
-
+            if (spSemestre.selectedItemPosition == 0) {
+                Toast.makeText(this, "Seleccione un semestre válido (1-10)", Toast.LENGTH_SHORT)
+                    .show()
                 return@setOnClickListener
             }
 
-            // Para esta práctica:
-            // Administrador = 1
-            // Usuario = 2
-            val rolId = spRol.selectedItemPosition
+            val semestre = spSemestre.selectedItem.toString().toInt()
 
             // OBJETO QUE ENVIAREMOS AL BACKEND
 
@@ -132,12 +139,15 @@ class RegistroActivity : AppCompatActivity() {
                 nombre = nombre,
                 apellido = apellido,
                 correo = correo,
-                edad = edad,
                 password = password,
-                rolId = rolId
+                edad = edadCalculada,
+                fechaNacimiento = fechaNacimientoSeleccionada,
+                universidad = universidad,
+                semestre = semestre
             )
 
             tvMensaje.text = "Registrando usuario..."
+            btnRegistrar.isEnabled = false
 
             // LLAMADA AL BACKEND
             ApiClient.usuarioApi
@@ -148,32 +158,44 @@ class RegistroActivity : AppCompatActivity() {
                         call: Call<Usuario>,
                         response: Response<Usuario>
                     ) {
+                        btnRegistrar.isEnabled = true
 
                         if (response.isSuccessful) {
+                            tvMensaje.text = ""
 
-                            val usuarioCreado = response.body()
-
-                            tvMensaje.text =
-                                "Usuario registrado correctamente"
-
-                            Toast.makeText(
-                                this@RegistroActivity,
-                                "Usuario creado. ID: ${usuarioCreado?.id}",
-                                Toast.LENGTH_LONG
-                            ).show()
-
-                            // Limpiar formulario
-                            etNombre.text.clear()
-                            etApellido.text.clear()
-                            etCorreo.text.clear()
-                            etEdad.text.clear()
-
-                            spRol.setSelection(0)
+                            // 4.2 MOSTRAR DIÁLOGO EMERGENTE DE ÉXITO
+                            val builder = AlertDialog.Builder(this@RegistroActivity)
+                            builder.setTitle("¡Registro exitoso!")
+                            builder.setMessage("El usuario ha sido registrado correctamente.")
+                            builder.setPositiveButton("ACEPTAR") { dialog, _ ->
+                                dialog.dismiss()
+                                // Regresar al Login
+                                finish()
+                            }
+                            builder.setCancelable(false)
+                            builder.show()
 
                         } else {
-
-                            tvMensaje.text =
+                            // 4.3 MANEJO DE ERRORES DEL BACKEND (Ej. HTTP 400 con JSON de mensaje)
+                            val errorBody = response.errorBody()?.string()
+                            val errorMessage = if (!errorBody.isNullOrBlank()) {
+                                try {
+                                    val jsonObject = JSONObject(errorBody)
+                                    jsonObject.optString(
+                                        "mensaje",
+                                        jsonObject.optString(
+                                            "message",
+                                            "Error del servidor: ${response.code()}"
+                                        )
+                                    )
+                                } catch (e: Exception) {
+                                    "Error del servidor: ${response.code()}"
+                                }
+                            } else {
                                 "Error del servidor: ${response.code()}"
+                            }
+
+                            tvMensaje.text = errorMessage
                         }
                     }
 
@@ -181,16 +203,25 @@ class RegistroActivity : AppCompatActivity() {
                         call: Call<Usuario>,
                         t: Throwable
                     ) {
-
-                        tvMensaje.text =
-                            "Error de conexión: ${t.message}"
+                        btnRegistrar.isEnabled = true
+                        tvMensaje.text = "Error de conexión: ${t.message}"
                     }
                 })
         }
+    }
 
-        // VOLVER AL LOGIN
-        btnVolver.setOnClickListener {
-            finish()
+    // CÁLCULO DE EDAD (DÍA, MES Y AÑO)
+    private fun calcularEdad(year: Int, month: Int, day: Int): Int {
+        val birthDate = Calendar.getInstance().apply { set(year, month, day) }
+        val currentDate = Calendar.getInstance()
+        var age = currentDate.get(Calendar.YEAR) - birthDate.get(Calendar.YEAR)
+
+        if (currentDate.get(Calendar.MONTH) < birthDate.get(Calendar.MONTH) ||
+            (currentDate.get(Calendar.MONTH) == birthDate.get(Calendar.MONTH) &&
+                    currentDate.get(Calendar.DAY_OF_MONTH) < birthDate.get(Calendar.DAY_OF_MONTH))
+        ) {
+            age--
         }
+        return age
     }
 }

@@ -6,5 +6,7 @@ data class CrearUsuarioRequest(
     val correo: String,
     val password: String,
     val edad: Int,
-    val rolId: Int
+    val fechaNacimiento: String,
+    val universidad: String,
+    val semestre: Int
 )

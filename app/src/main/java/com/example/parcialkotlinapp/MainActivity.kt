@@ -9,6 +9,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import java.util.Calendar
+import android.widget.ImageView
+import androidx.appcompat.app.AlertDialog
 
 class MainActivity : AppCompatActivity() {
 
@@ -88,17 +90,19 @@ class MainActivity : AppCompatActivity() {
         // VOLVER AL LOGIN
         // =====================================
 
-        val btnVolver2 =
-            findViewById<Button>(R.id.btnVolver2)
+        val btnCerrarSesion = findViewById<ImageView>(R.id.btnCerrarSesion)
 
-        btnVolver2.setOnClickListener {
-
-            val intent = Intent(
-                this,
-                LoginActivity::class.java
-            )
-
-            startActivity(intent)
+        btnCerrarSesion.setOnClickListener {
+            AlertDialog.Builder(this)
+                .setTitle("Cerrar sesión")
+                .setMessage("¿Está seguro de que desea cerrar sesión?")
+                .setPositiveButton("SALIR") { _, _ ->
+                    val intent = Intent(this, LoginActivity::class.java)
+                    intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                    startActivity(intent)
+                }
+                .setNegativeButton("CANCELAR", null)
+                .show()
         }
 
     }
